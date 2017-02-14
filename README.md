@@ -22,6 +22,7 @@ for await (const i of seq) {
 
 ## It's lazy
 Sequences are lazy. For example, in the following example only one map() action is performed irrespective of the length of the sequence.
+
 ```javascript
 const seq = await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)])
   .map(x => x * 2)
