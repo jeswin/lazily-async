@@ -64,19 +64,17 @@ await Seq.of([Promise.resolve(1), 2, 3, 4])
 ## exit(predicate)
 ```javascript
 await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3), Promise.resolve(4), Promise.resolve(5)])
-  .exit(x => x > 3)
+  .exit(async x => x > 3)
   .toArray()
 // [1, 2, 3]
 ```
 
-## exit(predicate) in the middle
+## exitAfter(predicate)
 ```javascript
 await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3), Promise.resolve(4), Promise.resolve(5)])
-  .map(x => x * 2)
-  .exit(x => x > 4)
-  .map(x => x * 10)
-  .toArray();
-// [20, 40]
+  .exitAfter(async x => x > 3)
+  .toArray()
+// [1, 2, 3, 4]
 ```
 
 ## find(predicate)
@@ -100,11 +98,25 @@ await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3), Promis
 // 1
 ```
 
+## first(predicate)
+```javascript
+await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3), Promise.resolve(4), Promise.resolve(5)])
+  .first(async x => x > 3);
+// 4
+```
+
 ## last()
 ```javascript
 await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3), Promise.resolve(4), Promise.resolve(5)])
   .last();
 // 5
+```
+
+## last(predicate)
+```javascript
+await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3), Promise.resolve(4), Promise.resolve(5)])
+  .last(async x => x < 3);
+// 2
 ```
 
 ## every(predicate)

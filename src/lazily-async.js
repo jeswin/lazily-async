@@ -31,6 +31,10 @@ export class Seq {
     return new Seq(exit(this.seq, fn, result));
   }
 
+  exitAfter(fn, result) {
+    return new Seq(exit(this.seq, fn, result));
+  }
+
   filter(fn) {
     return new Seq(filter(this.seq, fn));
   }
@@ -39,16 +43,16 @@ export class Seq {
     return await find(this.seq, fn);
   }
 
-  async first() {
-    return await first(this.seq);
+  async first(predicate) {
+    return await first(this.seq, predicate);
   }
 
   async includes(item) {
     return await includes(this.seq, item);
   }
 
-  async last() {
-    return await last(this.seq);
+  async last(predicate) {
+    return await last(this.seq, predicate);
   }
 
   map(fn) {
@@ -120,6 +124,18 @@ export function exit(seq, fn, result) {
   };
 }
 
+export function exitAfter(seq, fn, result) {
+  return async function*() {
+    for await (const item of seq()) {
+      if (await fn(item)) {
+        yield item;
+        return
+      }
+      yield item;
+    }
+  };
+}
+
 export async function find(seq, fn) {
   for await (const item of seq()) {
     if (await fn(item)) {
@@ -138,7 +154,8 @@ export function filter(seq, fn) {
   }
 }
 
-export async function first(seq) {
+export async function first(_seq, predicate) {
+  const seq = predicate ? filter(_seq, predicate) : _seq;
   for await (const item of seq()) {
     return item;
   }
@@ -148,7 +165,9 @@ export async function includes(seq, what) {
   return await some(seq, item => item === what);
 }
 
-export async function last(seq) {
+export async function last(_seq, predicate) {
+  const seq = predicate ? filter(_seq, predicate) : _seq;
+
   let prev;
   for await (const item of seq()) {
     prev = item;
