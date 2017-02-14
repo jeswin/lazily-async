@@ -21,7 +21,7 @@ for await (const i of seq) {
 ```
 
 ## It's lazy
-Sequences are lazy. For example, the following example only one map() action is performed irrespective of the length of the sequence.
+Sequences are lazy. For example, in the following example only one map() action is performed irrespective of the length of the sequence.
 ```javascript
 const seq = await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)])
   .map(x => x * 2)
@@ -40,7 +40,7 @@ await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)])
 await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)])
   .toPromises()
 //Returns a bunch of Promises
-Promise.all(promises, (results) => console.log(results));
+Promise.all(promises, results => console.log(results));
 // [1, 2, 3]
 ```
 
