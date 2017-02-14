@@ -59,8 +59,12 @@ export class Seq {
     return new Seq(map(this.seq, fn));
   }
 
-  async reduce(fn, initialValue) {
-    return await reduce(this.seq, fn, initialValue)
+  async reduce(fn, initialValue, fnShortCircuit) {
+    return await reduce(this.seq, fn, initialValue, fnShortCircuit)
+  }
+
+  reverse() {
+    return new Seq(reverse(this.seq));
   }
 
   slice(begin, end) {
@@ -69,10 +73,6 @@ export class Seq {
 
   async some(fn) {
     return await some(this.seq, fn)
-  }
-
-  reverse() {
-    return new Seq(reverse(this.seq));
   }
 
   async toArray() {
@@ -105,51 +105,61 @@ export function concat(seq, newSeq) {
 }
 
 export async function every(seq, fn) {
+  let i = 0;
   for await (const item of seq()) {
-    if (!await fn(item)) {
+    if (!await fn(item, i, seq)) {
       return false;
     }
+    i++;
   }
   return true;
 }
 
 export function exit(seq, fn, result) {
   return async function*() {
+    let i = 0;
     for await (const item of seq()) {
-      if (await fn(item)) {
+      if (await fn(item, i, seq)) {
         return
       }
       yield item;
+      i++;
     }
   };
 }
 
 export function exitAfter(seq, fn, result) {
   return async function*() {
+    let i = 0;
     for await (const item of seq()) {
-      if (await fn(item)) {
+      if (await fn(item, i, seq)) {
         yield item;
         return
       }
       yield item;
+      i++;
     }
   };
 }
 
 export async function find(seq, fn) {
+  let i = 0;
   for await (const item of seq()) {
-    if (await fn(item)) {
+    if (await fn(item, i, seq)) {
       return item;
     }
+    i++;
   }
 }
 
 export function filter(seq, fn) {
   return async function*() {
+    let i = 0;
     for await (const item of seq()) {
-      if (await fn(item)) {
+      if (await fn(item, i, seq)) {
         yield item;
       }
+      i++;
     }
   }
 }
@@ -177,16 +187,23 @@ export async function last(_seq, predicate) {
 
 export function map(seq, fn) {
   return async function*() {
+    let i = 0;
     for await (const item of seq()) {
-      yield await fn(item);
+      yield await fn(item, i, seq);
+      i++;
     }
   }
 }
 
-export async function reduce(seq, fn, initialValue) {
+export async function reduce(seq, fn, initialValue, fnShortCircuit) {
   let acc = initialValue;
+  let i = 0;
   for await (const item of seq()) {
-    acc = await fn(acc, item);
+    acc = await fn(acc, item, i, seq);
+    if (fnShortCircuit && await fnShortCircuit(acc, item, i, seq)) {
+      return acc;
+    }
+    i++;
   }
   return acc;
 }
@@ -216,10 +233,12 @@ export function slice(seq, begin, end) {
 }
 
 export async function some(seq, fn) {
+  let i = 0;
   for await (const item of seq()) {
-    if (await fn(item)) {
+    if (await fn(item, i, seq)) {
       return true;
     }
+    i++;
   }
   return false;
 }

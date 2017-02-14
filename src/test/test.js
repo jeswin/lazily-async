@@ -64,6 +64,12 @@ describe("lazily-async", async () => {
     result.should.equal(15);
   })
 
+  it(`reduce() short-circuited`, async () => {
+    const result =  await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3), Promise.resolve(4), Promise.resolve(5)])
+      .reduce(async (acc, x) => acc + x, 0, async acc => acc > 6)
+    result.should.equal(10);
+  })
+
   it(`first()`, async () => {
     const result = await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3), Promise.resolve(4), Promise.resolve(5)])
       .first();

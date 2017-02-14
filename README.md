@@ -91,6 +91,13 @@ await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3), Promis
 // 15
 ```
 
+## short-circuited reduce(fn, initialValue, stopPredicate)
+```javascript
+await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3), Promise.resolve(4), Promise.resolve(5)])
+  .reduce(async (acc, x) => acc + x, 0, async acc => acc > 6)
+// 10
+```
+
 ## first()
 ```javascript
 await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3), Promise.resolve(4), Promise.resolve(5)])
