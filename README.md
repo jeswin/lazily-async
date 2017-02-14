@@ -38,7 +38,7 @@ await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)])
 
 ## toPromises()
 ```javascript
-await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)])
+const promises = Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)])
   .toPromises()
 //Returns a bunch of Promises
 Promise.all(promises, results => console.log(results));
