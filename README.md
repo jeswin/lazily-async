@@ -143,7 +143,7 @@ await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3), Promis
 // [5, 4, 3, 2, 1]
 ```
 
-## slice(begin, end)()
+## slice(begin, end)
 ```javascript
 await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3), Promise.resolve(4), Promise.resolve(5)])
   .slice(2, 4)
