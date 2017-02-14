@@ -46,7 +46,7 @@ Promise.all(promises, (results) => console.log(results));
 
 ## map(fn)
 ```javascript
-Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)])
+await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)])
   .map(x => x * 2)
   .toArray()
 // [2, 4, 6]
