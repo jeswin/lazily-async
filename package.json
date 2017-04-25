@@ -1,6 +1,6 @@
 {
   "name": "lazily-async",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "author": "Jeswin<jeswinpk@agilehead.com>",
   "scripts": {
     "test": "mocha dist/test/test.js"
@@ -8,11 +8,14 @@
   "main": "dist/lazily-async.js",
   "dependencies": {},
   "devDependencies": {
+    "babel-cli": "^6.24.1",
     "babel-core": "^6.22.1",
     "babel-plugin-transform-async-generator-functions": "^6.22.0",
     "babel-polyfill": "^6.23.0",
+    "babel-preset-flow": "^6.23.0",
     "babel-preset-modern-browsers": "^8.0.0",
     "babel-preset-stage-3": "^6.22.0",
+    "flow-bin": "^0.44.2",
     "mocha": "*",
     "should": "*",
     "source-map-support": "^0.4.8"

@@ -1,16 +1,17 @@
-export class Seq {
+/* @flow */
+type PredicateType<T> = (val: T) => boolean;
+
+type SequenceFnType<T> = () => AsyncGenerator<T, void, void>;
+
+export class Seq<T> {
+  seq: SequenceFnType<T>;
+
   static of(list) {
     return new Seq(sequence(list));
   }
 
-  constructor(seq) {
+  constructor(seq: SequenceFnType<T>) {
     this.seq = seq;
-  }
-
-  *[Symbol.iterator]() {
-    for (const i of this.seq()) {
-      yield i;
-    }
   }
 
   async *[Symbol.asyncIterator]() {
@@ -19,92 +20,102 @@ export class Seq {
     }
   }
 
-  concat(seq) {
+  concat(seq: Seq<T>): Seq<T> {
     return new Seq(concat(this.seq, seq.seq));
   }
 
-  async every(fn) {
-    return await every(this.seq, fn)
+  async every(fn: PredicateType<T>) {
+    return await every(this.seq, fn);
   }
 
-  exit(fn, result) {
+  exit(fn: PredicateType<T>, result: any): Seq<T> {
     return new Seq(exit(this.seq, fn, result));
   }
 
-  exitAfter(fn, result) {
-    return new Seq(exit(this.seq, fn, result));
+  exitAfter(fn: PredicateType<T>, result: any): Seq<T> {
+    return new Seq(exitAfter(this.seq, fn, result));
   }
 
-  filter(fn) {
+  filter(fn: PredicateType<T>): Seq<T> {
     return new Seq(filter(this.seq, fn));
   }
 
-  async find(fn) {
+  async find(fn: PredicateType<T>): Promise<?T> {
     return await find(this.seq, fn);
   }
 
-  async first(predicate) {
+  async first(predicate: PredicateType<T>): Promise<?T> {
     return await first(this.seq, predicate);
   }
 
-  async includes(item) {
+  async includes(item: T): Promise<boolean> {
     return await includes(this.seq, item);
   }
 
-  async last(predicate) {
+  async last(predicate: PredicateType<T>): Promise<?T> {
     return await last(this.seq, predicate);
   }
 
-  map(fn) {
+  map<TOut>(fn: (val: T) => TOut): Seq<TOut> {
     return new Seq(map(this.seq, fn));
   }
 
-  async reduce(fn, initialValue, fnShortCircuit) {
-    return await reduce(this.seq, fn, initialValue, fnShortCircuit)
+  async reduce<TAcc>(
+    fn: (acc: TAcc, item: T, i: number, seq: SequenceFnType<T>) => TAcc,
+    initialValue: TAcc,
+    fnShortCircuit: (
+      acc: TAcc,
+      item: T,
+      i: number,
+      seq: SequenceFnType<T>
+    ) => boolean
+  ) {
+    return await reduce(this.seq, fn, initialValue, fnShortCircuit);
   }
 
-  reverse() {
+  reverse(): Seq<T> {
     return new Seq(reverse(this.seq));
   }
 
-  slice(begin, end) {
+  slice(begin: number, end: number): Seq<T> {
     return new Seq(slice(this.seq, begin, end));
   }
 
-  async some(fn) {
-    return await some(this.seq, fn)
+  async some(fn: PredicateType<T>) {
+    return await some(this.seq, fn);
   }
 
-  async toArray() {
+  async toArray() : Promise<Array<T>> {
     return await toArray(this.seq);
-  }
-
-  toPromises() {
-    return toPromises(this.seq);
   }
 }
 
-export function sequence(list) {
-  return function* gen() {
-    for (const item of list) {
+export function sequence<T>(list: AsyncIterable<T>): SequenceFnType<T> {
+  return async function* gen() {
+    for await (const item of list) {
       yield item;
     }
   };
 }
 
-
-export function concat(seq, newSeq) {
-  return function*() {
-    for (const i of seq()) {
+export function concat<T>(
+  seq: SequenceFnType<T>,
+  newSeq: SequenceFnType<T>
+): SequenceFnType<T> {
+  return async function*() {
+    for await (const i of seq()) {
       yield i;
     }
-    for (const j of newSeq()) {
+    for await (const j of newSeq()) {
       yield j;
     }
-  }
+  };
 }
 
-export async function every(seq, fn) {
+export async function every<T>(
+  seq: SequenceFnType<T>,
+  fn: PredicateType<T>
+): Promise<boolean> {
   let i = 0;
   for await (const item of seq()) {
     if (!await fn(item, i, seq)) {
@@ -115,12 +126,16 @@ export async function every(seq, fn) {
   return true;
 }
 
-export function exit(seq, fn, result) {
+export function exit<T>(
+  seq: SequenceFnType<T>,
+  fn: PredicateType<T>,
+  result: any
+): SequenceFnType<T> {
   return async function*() {
     let i = 0;
     for await (const item of seq()) {
       if (await fn(item, i, seq)) {
-        return
+        return result;
       }
       yield item;
       i++;
@@ -128,13 +143,17 @@ export function exit(seq, fn, result) {
   };
 }
 
-export function exitAfter(seq, fn, result) {
+export function exitAfter<T>(
+  seq: SequenceFnType<T>,
+  fn: PredicateType<T>,
+  result: any
+): SequenceFnType<T> {
   return async function*() {
     let i = 0;
     for await (const item of seq()) {
       if (await fn(item, i, seq)) {
         yield item;
-        return
+        return result;
       }
       yield item;
       i++;
@@ -142,7 +161,10 @@ export function exitAfter(seq, fn, result) {
   };
 }
 
-export async function find(seq, fn) {
+export async function find<T>(
+  seq: SequenceFnType<T>,
+  fn: PredicateType<T>
+): Promise<?T> {
   let i = 0;
   for await (const item of seq()) {
     if (await fn(item, i, seq)) {
@@ -152,7 +174,10 @@ export async function find(seq, fn) {
   }
 }
 
-export function filter(seq, fn) {
+export function filter<T>(
+  seq: SequenceFnType<T>,
+  fn: PredicateType<T>
+): SequenceFnType<T> {
   return async function*() {
     let i = 0;
     for await (const item of seq()) {
@@ -161,21 +186,30 @@ export function filter(seq, fn) {
       }
       i++;
     }
-  }
+  };
 }
 
-export async function first(_seq, predicate) {
+export async function first<T>(
+  _seq: SequenceFnType<T>,
+  predicate: PredicateType<T>
+): Promise<?T> {
   const seq = predicate ? filter(_seq, predicate) : _seq;
   for await (const item of seq()) {
     return item;
   }
 }
 
-export async function includes(seq, what) {
+export async function includes<T>(
+  seq: SequenceFnType<T>,
+  what: T
+): Promise<boolean> {
   return await some(seq, item => item === what);
 }
 
-export async function last(_seq, predicate) {
+export async function last<T>(
+  _seq: SequenceFnType<T>,
+  predicate: PredicateType<T>
+): Promise<?T> {
   const seq = predicate ? filter(_seq, predicate) : _seq;
 
   let prev;
@@ -185,22 +219,35 @@ export async function last(_seq, predicate) {
   return prev;
 }
 
-export function map(seq, fn) {
+export function map<T, TOut>(
+  seq: SequenceFnType<T>,
+  fn: (val: T) => TOut
+): SequenceFnType<TOut> {
   return async function*() {
     let i = 0;
     for await (const item of seq()) {
       yield await fn(item, i, seq);
       i++;
     }
-  }
+  };
 }
 
-export async function reduce(seq, fn, initialValue, fnShortCircuit) {
+export async function reduce<T, TAcc>(
+  seq: SequenceFnType<T>,
+  fn: (acc: TAcc, item: T, i: number, seq: SequenceFnType<T>) => TAcc,
+  initialValue: TAcc,
+  fnShortCircuit: (
+    acc: TAcc,
+    item: T,
+    i: number,
+    seq: SequenceFnType<T>
+  ) => boolean
+): Promise<TAcc> {
   let acc = initialValue;
   let i = 0;
   for await (const item of seq()) {
     acc = await fn(acc, item, i, seq);
-    if (fnShortCircuit && await fnShortCircuit(acc, item, i, seq)) {
+    if (fnShortCircuit && (await fnShortCircuit(acc, item, i, seq))) {
       return acc;
     }
     i++;
@@ -208,19 +255,23 @@ export async function reduce(seq, fn, initialValue, fnShortCircuit) {
   return acc;
 }
 
-export function reverse(seq) {
+export function reverse<T>(seq: SequenceFnType<T>): SequenceFnType<T> {
   return async function*() {
-    const all = toPromises(seq).reverse();
+    const all = (await toArray(seq)).reverse();
     for (const item of all) {
       yield item;
     }
-  }
+  };
 }
 
-export function slice(seq, begin, end) {
+export function slice<T>(
+  seq: SequenceFnType<T>,
+  begin: number,
+  end: number
+): SequenceFnType<T> {
   return async function*() {
     let i = 0;
-    for (const item of seq()) {
+    for await (const item of seq()) {
       if (i >= begin && (!end || i < end)) {
         yield item;
       }
@@ -229,10 +280,13 @@ export function slice(seq, begin, end) {
         return;
       }
     }
-  }
+  };
 }
 
-export async function some(seq, fn) {
+export async function some<T>(
+  seq: SequenceFnType<T>,
+  fn: PredicateType<T>
+): Promise<boolean> {
   let i = 0;
   for await (const item of seq()) {
     if (await fn(item, i, seq)) {
@@ -243,17 +297,9 @@ export async function some(seq, fn) {
   return false;
 }
 
-export async function toArray(seq) {
+export async function toArray<T>(seq: SequenceFnType<T>): Promise<Array<T>> {
   const results = [];
   for await (const item of seq()) {
-    results.push(item);
-  }
-  return results;
-}
-
-export function toPromises(seq) {
-  const results = [];
-  for (const item of seq()) {
     results.push(item);
   }
   return results;

@@ -1,5 +1,5 @@
 {
   "sourceMaps": true,
-  "presets": ["modern-browsers", "stage-3"],
+  "presets": ["modern-browsers", "stage-3", "flow"],
   "plugins": ["transform-async-generator-functions"]
 }
