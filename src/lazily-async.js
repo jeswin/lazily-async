@@ -1,5 +1,9 @@
 /* @flow */
-type PredicateType<T> = (val: T, i?: number, seq?: SequenceFnType<T>) => boolean;
+type PredicateType<T> = (
+  val: T,
+  i?: number,
+  seq?: SequenceFnType<T>
+) => boolean;
 
 type SequenceFnType<T> = () => AsyncGenerator<T, void, void>;
 
@@ -56,14 +60,16 @@ export class Seq<T> {
     return await last(this.seq, predicate);
   }
 
-  map<TOut>(fn: (val: T, i: number, seq: SequenceFnType<T>) => TOut): Seq<TOut> {
+  map<TOut>(
+    fn: (val: T, i: number, seq: SequenceFnType<T>) => TOut
+  ): Seq<TOut> {
     return new Seq(map(this.seq, fn));
   }
 
   async reduce<TAcc>(
     fn: (acc: TAcc, item: T, i?: number, seq?: SequenceFnType<T>) => TAcc,
     initialValue: TAcc,
-    fnShortCircuit: (
+    fnShortCircuit?: (
       acc: TAcc,
       item: T,
       i?: number,
@@ -236,7 +242,7 @@ export async function reduce<T, TAcc>(
   seq: SequenceFnType<T>,
   fn: (acc: TAcc, item: T, i?: number, seq?: SequenceFnType<T>) => TAcc,
   initialValue: TAcc,
-  fnShortCircuit: (
+  fnShortCircuit?: (
     acc: TAcc,
     item: T,
     i?: number,
