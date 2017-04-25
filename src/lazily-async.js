@@ -28,11 +28,11 @@ export class Seq<T> {
     return await every(this.seq, fn);
   }
 
-  exit(fn: PredicateType<T>, result: any): Seq<T> {
+  exit(fn: PredicateType<T>, result?: any): Seq<T> {
     return new Seq(exit(this.seq, fn, result));
   }
 
-  exitAfter(fn: PredicateType<T>, result: any): Seq<T> {
+  exitAfter(fn: PredicateType<T>, result?: any): Seq<T> {
     return new Seq(exitAfter(this.seq, fn, result));
   }
 
@@ -61,13 +61,13 @@ export class Seq<T> {
   }
 
   async reduce<TAcc>(
-    fn: (acc: TAcc, item: T, i: number, seq: SequenceFnType<T>) => TAcc,
+    fn: (acc: TAcc, item: T, i?: number, seq?: SequenceFnType<T>) => TAcc,
     initialValue: TAcc,
     fnShortCircuit: (
       acc: TAcc,
       item: T,
-      i: number,
-      seq: SequenceFnType<T>
+      i?: number,
+      seq?: SequenceFnType<T>
     ) => boolean
   ) {
     return await reduce(this.seq, fn, initialValue, fnShortCircuit);
@@ -77,7 +77,7 @@ export class Seq<T> {
     return new Seq(reverse(this.seq));
   }
 
-  slice(begin: number, end: number): Seq<T> {
+  slice(begin: number, end?: number): Seq<T> {
     return new Seq(slice(this.seq, begin, end));
   }
 
@@ -85,7 +85,7 @@ export class Seq<T> {
     return await some(this.seq, fn);
   }
 
-  async toArray() : Promise<Array<T>> {
+  async toArray(): Promise<Array<T>> {
     return await toArray(this.seq);
   }
 }
@@ -129,7 +129,7 @@ export async function every<T>(
 export function exit<T>(
   seq: SequenceFnType<T>,
   fn: PredicateType<T>,
-  result: any
+  result?: any
 ): SequenceFnType<T> {
   return async function*() {
     let i = 0;
@@ -146,7 +146,7 @@ export function exit<T>(
 export function exitAfter<T>(
   seq: SequenceFnType<T>,
   fn: PredicateType<T>,
-  result: any
+  result?: any
 ): SequenceFnType<T> {
   return async function*() {
     let i = 0;
@@ -234,13 +234,13 @@ export function map<T, TOut>(
 
 export async function reduce<T, TAcc>(
   seq: SequenceFnType<T>,
-  fn: (acc: TAcc, item: T, i: number, seq: SequenceFnType<T>) => TAcc,
+  fn: (acc: TAcc, item: T, i?: number, seq?: SequenceFnType<T>) => TAcc,
   initialValue: TAcc,
   fnShortCircuit: (
     acc: TAcc,
     item: T,
-    i: number,
-    seq: SequenceFnType<T>
+    i?: number,
+    seq?: SequenceFnType<T>
   ) => boolean
 ): Promise<TAcc> {
   let acc = initialValue;
@@ -267,7 +267,7 @@ export function reverse<T>(seq: SequenceFnType<T>): SequenceFnType<T> {
 export function slice<T>(
   seq: SequenceFnType<T>,
   begin: number,
-  end: number
+  end?: number
 ): SequenceFnType<T> {
   return async function*() {
     let i = 0;

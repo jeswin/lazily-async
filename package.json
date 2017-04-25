@@ -1,6 +1,6 @@
 {
   "name": "lazily-async",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "author": "Jeswin<jeswinpk@agilehead.com>",
   "scripts": {
     "test": "mocha dist/test/test.js"
