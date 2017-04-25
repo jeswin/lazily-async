@@ -1,3 +1,4 @@
 rm -rf dist
 cp -r src dist
-babel src/ -d dist/ "$@" --source-maps 
+find dist/ -name *.js -type f -exec mv {} {}.flow \;
+babel src/ -d dist/ "$@" --source-maps
