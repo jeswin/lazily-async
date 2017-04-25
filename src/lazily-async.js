@@ -1,5 +1,5 @@
 /* @flow */
-type PredicateType<T> = (val: T) => boolean;
+type PredicateType<T> = (val: T, i?: number, seq?: SequenceFnType<T>) => boolean;
 
 type SequenceFnType<T> = () => AsyncGenerator<T, void, void>;
 
@@ -56,7 +56,7 @@ export class Seq<T> {
     return await last(this.seq, predicate);
   }
 
-  map<TOut>(fn: (val: T) => TOut): Seq<TOut> {
+  map<TOut>(fn: (val: T, i: number, seq: SequenceFnType<T>) => TOut): Seq<TOut> {
     return new Seq(map(this.seq, fn));
   }
 
@@ -221,7 +221,7 @@ export async function last<T>(
 
 export function map<T, TOut>(
   seq: SequenceFnType<T>,
-  fn: (val: T) => TOut
+  fn: (val: T, i: number, seq: SequenceFnType<T>) => TOut
 ): SequenceFnType<TOut> {
   return async function*() {
     let i = 0;
