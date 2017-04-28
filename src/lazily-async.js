@@ -28,7 +28,7 @@ export class Seq<T> {
     return new Seq(concat(this.seq, seq.seq));
   }
 
-  async every(fn: PredicateType<T>) {
+  async every(fn: PredicateType<T>) : Promise<boolean> {
     return await every(this.seq, fn);
   }
 
@@ -75,7 +75,7 @@ export class Seq<T> {
       i?: number,
       seq?: SequenceFnType<T>
     ) => boolean
-  ) {
+  ) : Promise<TAcc> {
     return await reduce(this.seq, fn, initialValue, fnShortCircuit);
   }
 
@@ -87,7 +87,7 @@ export class Seq<T> {
     return new Seq(slice(this.seq, begin, end));
   }
 
-  async some(fn: PredicateType<T>) {
+  async some(fn: PredicateType<T>) : Promise<boolean> {
     return await some(this.seq, fn);
   }
 
