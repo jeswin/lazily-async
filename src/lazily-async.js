@@ -28,7 +28,7 @@ export class Seq<T> {
     return new Seq(concat(this.seq, seq.seq));
   }
 
-  async every(fn: PredicateType<T>) : Promise<boolean> {
+  async every(fn: PredicateType<T>): Promise<boolean> {
     return await every(this.seq, fn);
   }
 
@@ -75,7 +75,7 @@ export class Seq<T> {
       i?: number,
       seq?: SequenceFnType<T>
     ) => boolean
-  ) : Promise<TAcc> {
+  ): Promise<TAcc> {
     return await reduce(this.seq, fn, initialValue, fnShortCircuit);
   }
 
@@ -87,8 +87,12 @@ export class Seq<T> {
     return new Seq(slice(this.seq, begin, end));
   }
 
-  async some(fn: PredicateType<T>) : Promise<boolean> {
+  async some(fn: PredicateType<T>): Promise<boolean> {
     return await some(this.seq, fn);
+  }
+
+  sort(fn: (a: T, b: T) => number): Seq<T> {
+    return new Seq(sort(this.seq, fn));
   }
 
   async toArray(): Promise<Array<T>> {
@@ -301,6 +305,19 @@ export async function some<T>(
     i++;
   }
   return false;
+}
+
+
+export function sort<T>(
+  seq: SequenceFnType<T>,
+  fn: (a: T, b: T) => number
+): SequenceFnType<T> {
+  return async function*() {
+    const all = (await toArray(seq)).sort(fn);
+    for (const item of all) {
+      yield item;
+    }
+  };
 }
 
 export async function toArray<T>(seq: SequenceFnType<T>): Promise<Array<T>> {

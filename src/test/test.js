@@ -18,10 +18,16 @@ describe("lazily-async", async () => {
   function getSequence() {
     function makePromise(val) {
       return new Promise((res, rej) => {
-        setTimeout(() => res(val), parseInt(Math.random() * 10))
-      })
+        setTimeout(() => res(val), parseInt(Math.random() * 10));
+      });
     }
-    return Seq.of([makePromise(1), makePromise(2), makePromise(3), makePromise(4), makePromise(5)]);
+    return Seq.of([
+      makePromise(1),
+      makePromise(2),
+      makePromise(3),
+      makePromise(4),
+      makePromise(5)
+    ]);
   }
 
   it(`should return a sequence`, async () => {
@@ -171,5 +177,11 @@ describe("lazily-async", async () => {
     const seq = getSequence().slice(1, 4);
     const results = await toArray(seq);
     results.should.deepEqual([2, 3, 4]);
+  });
+
+  it(`sort()`, async () => {
+    const seq = Seq.of([Promise.resolve(3), 1, 2]).sort((a, b) => a - b);
+    const results = await toArray(seq);
+    results.should.deepEqual([1, 2, 3]);
   });
 });
