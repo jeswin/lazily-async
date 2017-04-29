@@ -45,16 +45,22 @@ describe("lazily-async", async () => {
     results.should.deepEqual([1, 2, 3, 4, 5]);
   });
 
-  it(`map()`, async () => {
-    const seq = getSequence().map(async x => x * 2);
+  it(`concat()`, async () => {
+    const seq = getSequence().concat(
+      Seq.of([Promise.resolve(6), Promise.resolve(7), Promise.resolve(8)])
+    );
     const results = await toArray(seq);
-    results.should.deepEqual([2, 4, 6, 8, 10]);
+    results.should.deepEqual([1, 2, 3, 4, 5, 6, 7, 8]);
   });
 
-  it(`filter()`, async () => {
-    const seq = getSequence().filter(async x => x > 2);
-    const results = await toArray(seq);
-    results.should.deepEqual([3, 4, 5]);
+  it(`every()`, async () => {
+    const result = await getSequence().every(async x => x <= 5);
+    result.should.be.ok();
+  });
+
+  it(`every() negative`, async () => {
+    const result = await getSequence().every(async x => x < 5);
+    result.should.not.be.ok();
   });
 
   it(`exit() early`, async () => {
@@ -78,10 +84,52 @@ describe("lazily-async", async () => {
     results.should.deepEqual([20, 40]);
   });
 
+  it(`filter()`, async () => {
+    const seq = getSequence().filter(async x => x > 2);
+    const results = await toArray(seq);
+    results.should.deepEqual([3, 4, 5]);
+  });
+
   it(`find()`, async () => {
     const result = await getSequence().find(async x => x * 10 === 30);
 
     result.should.equal(3);
+  });
+
+  it(`first()`, async () => {
+    const result = await getSequence().first();
+    result.should.equal(1);
+  });
+
+  it(`first(predicate)`, async () => {
+    const result = await getSequence().first(async x => x > 3);
+    result.should.equal(4);
+  });
+
+  it(`includes()`, async () => {
+    const result = await getSequence().includes(3);
+    result.should.be.ok();
+  });
+
+  it(`includes() negative`, async () => {
+    const result = await getSequence().includes(10);
+    result.should.not.be.ok();
+  });
+
+  it(`last()`, async () => {
+    const result = await getSequence().last();
+    result.should.equal(5);
+  });
+
+  it(`last(predicate)`, async () => {
+    const result = await getSequence().last(async x => x < 3);
+    result.should.equal(2);
+  });
+
+  it(`map()`, async () => {
+    const seq = getSequence().map(async x => x * 2);
+    const results = await toArray(seq);
+    results.should.deepEqual([2, 4, 6, 8, 10]);
   });
 
   it(`reduce()`, async () => {
@@ -96,69 +144,6 @@ describe("lazily-async", async () => {
       async acc => acc > 6
     );
     result.should.equal(10);
-  });
-
-  it(`first()`, async () => {
-    const result = await getSequence().first();
-    result.should.equal(1);
-  });
-
-  it(`first(predicate)`, async () => {
-    const result = await getSequence().first(async x => x > 3);
-    result.should.equal(4);
-  });
-
-  it(`last()`, async () => {
-    const result = await getSequence().last();
-    result.should.equal(5);
-  });
-
-  it(`last(predicate)`, async () => {
-    const result = await getSequence().last(async x => x < 3);
-    result.should.equal(2);
-  });
-
-  it(`every()`, async () => {
-    const result = await getSequence().every(async x => x <= 5);
-    result.should.be.ok();
-  });
-
-  it(`every() negative`, async () => {
-    const result = await getSequence().every(async x => x < 5);
-    result.should.not.be.ok();
-  });
-
-  it(`some()`, async () => {
-    const result = await getSequence().some(async x => x === 3);
-    result.should.be.ok();
-  });
-
-  it(`some() negative`, async () => {
-    const result = await getSequence().every(async x => x === 10);
-    result.should.not.be.ok();
-  });
-
-  it(`toArray()`, async () => {
-    const result = await getSequence().toArray();
-    result.should.deepEqual([1, 2, 3, 4, 5]);
-  });
-
-  it(`includes()`, async () => {
-    const result = await getSequence().includes(3);
-    result.should.be.ok();
-  });
-
-  it(`includes() negative`, async () => {
-    const result = await getSequence().includes(10);
-    result.should.not.be.ok();
-  });
-
-  it(`concat()`, async () => {
-    const seq = getSequence().concat(
-      Seq.of([Promise.resolve(6), Promise.resolve(7), Promise.resolve(8)])
-    );
-    const results = await toArray(seq);
-    results.should.deepEqual([1, 2, 3, 4, 5, 6, 7, 8]);
   });
 
   it(`reverse()`, async () => {
@@ -179,9 +164,24 @@ describe("lazily-async", async () => {
     results.should.deepEqual([2, 3, 4]);
   });
 
+  it(`some()`, async () => {
+    const result = await getSequence().some(async x => x === 3);
+    result.should.be.ok();
+  });
+
+  it(`some() negative`, async () => {
+    const result = await getSequence().every(async x => x === 10);
+    result.should.not.be.ok();
+  });
+
   it(`sort()`, async () => {
     const seq = Seq.of([Promise.resolve(3), 1, 2]).sort((a, b) => a - b);
     const results = await toArray(seq);
     results.should.deepEqual([1, 2, 3]);
+  });
+
+  it(`toArray()`, async () => {
+    const result = await getSequence().toArray();
+    result.should.deepEqual([1, 2, 3, 4, 5]);
   });
 });
