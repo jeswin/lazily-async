@@ -1,7 +1,7 @@
 {
   "name": "lazily-async",
   "version": "0.0.15",
-  "author": "Jeswin<jeswinpk@agilehead.com>",
+  "author": "Isotropy Team<isotropy@agilehead.com>",
   "scripts": {
     "test": "mocha dist/test/test.js"
   },
