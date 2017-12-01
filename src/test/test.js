@@ -30,8 +30,15 @@ describe("lazily-async", async () => {
     ]);
   }
 
-  it(`should return a sequence`, async () => {
+  it(`Seq(list) should return a sequence`, async () => {
     const seq = getSequence();
+    const results = await toArray(seq);
+    results.should.deepEqual([1, 2, 3, 4, 5]);
+  });
+
+  it(`Seq(seq) should return a sequence`, async () => {
+    const _seq = getSequence();
+    const seq = Seq.of(_seq);
     const results = await toArray(seq);
     results.should.deepEqual([1, 2, 3, 4, 5]);
   });
