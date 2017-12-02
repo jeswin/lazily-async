@@ -113,6 +113,18 @@ describe("lazily-async", async () => {
     result.should.equal(4);
   });
 
+  it(`flatMap()`, async () => {
+    const seq = getSequence().flatMap(async x => Seq.of([x + 10, x + 20]));
+    const results = await toArray(seq);
+    results.should.deepEqual([11, 21, 12, 22, 13, 23, 14, 24, 15, 25]);
+  });
+
+  it(`flatMap() with an array as child`, async () => {
+    const seq = getSequence().flatMap(async x => [x + 10, x + 20]);
+    const results = await toArray(seq);
+    results.should.deepEqual([11, 21, 12, 22, 13, 23, 14, 24, 15, 25]);
+  });
+
   it(`includes()`, async () => {
     const result = await getSequence().includes(3);
     result.should.be.ok();

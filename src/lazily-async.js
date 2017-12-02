@@ -52,6 +52,12 @@ export class Seq<T> {
     return await first(this.seq, predicate);
   }
 
+  flatMap<TOut>(
+    fn: (val: T, i: number, seq: SequenceFnType<T>) => SequenceFnType<TOut>
+  ) : Seq<TOut> {
+    return new Seq(flatMap(this.seq, fn));
+  }
+
   async includes(item: T): Promise<boolean> {
     return await includes(this.seq, item);
   }
@@ -209,6 +215,22 @@ export async function first<T>(
   }
 }
 
+export function flatMap<T, TOut>(
+  seq: SequenceFnType<T>,
+  fn: (val: T, i: number, seq: SequenceFnType<T>) => SequenceFnType<TOut>
+): SequenceFnType<TOut> {
+  return async function*() {
+    let i = 0;
+    for await (const item of seq()) {
+      const childSeq = await fn(item, i, seq);
+      for await (const child of childSeq) {
+        yield child;
+      }
+      i++;
+    }
+  };
+}
+
 export async function includes<T>(
   seq: SequenceFnType<T>,
   what: T
@@ -306,7 +328,6 @@ export async function some<T>(
   }
   return false;
 }
-
 
 export function sort<T>(
   seq: SequenceFnType<T>,

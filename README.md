@@ -44,6 +44,14 @@ await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)])
 // [2, 4, 6]
 ```
 
+## flatMap(fn)
+```javascript
+await Seq.of([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)])
+  .flatMap(x => [x*10, x*20])
+  .toArray()
+// [11, 21, 12, 22, 13, 23]
+```
+
 ## filter(predicate)
 ```javascript
 await Seq.of([Promise.resolve(1), 2, 3, 4])
