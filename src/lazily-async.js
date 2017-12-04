@@ -73,8 +73,8 @@ export class Seq<T> {
   }
 
   async reduce<TAcc>(
-    fn: (acc: TAcc, item: T, i?: number, seq?: SequenceFnType<T>) => TAcc,
-    initialValue: TAcc,
+    fn: (acc: TAcc, item: T, i?: number, seq?: SequenceFnType<T>) => Promise<TAcc>,
+    initialValue: Promise<TAcc>,
     fnShortCircuit?: (
       acc: TAcc,
       item?: T,
@@ -266,8 +266,8 @@ export function map<T, TOut>(
 
 export async function reduce<T, TAcc>(
   seq: SequenceFnType<T>,
-  fn: (acc: TAcc, item: T, i?: number, seq?: SequenceFnType<T>) => TAcc,
-  initialValue: TAcc,
+  fn: (acc: TAcc, item: T, i?: number, seq?: SequenceFnType<T>) => Promise<TAcc>,
+  initialValue: Promise<TAcc>,
   fnShortCircuit?: (
     acc: TAcc,
     item?: T,
@@ -275,10 +275,10 @@ export async function reduce<T, TAcc>(
     seq?: SequenceFnType<T>
   ) => boolean
 ): Promise<TAcc> {
-  let acc = initialValue;
+  let acc = await initialValue;
   let i = 0;
   for await (const item of seq()) {
-    acc = await fn(acc, item, i, seq);
+    acc = await fn(await acc, item, i, seq);
     if (fnShortCircuit && (await fnShortCircuit(acc, item, i, seq))) {
       return acc;
     }
