@@ -46,6 +46,15 @@ describe("lazily-async", async () => {
   it(`iteration`, async () => {
     const seq = getSequence();
     const results = [];
+    for (const i of seq) {
+      results.push(await i);
+    }
+    results.should.deepEqual([1, 2, 3, 4, 5]);
+  });
+
+  it(`async iteration`, async () => {
+    const seq = getSequence();
+    const results = [];
     for await (const i of seq) {
       results.push(i);
     }
