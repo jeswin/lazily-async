@@ -18,12 +18,6 @@ export class Seq<T> {
     this.seq = seq;
   }
 
-  *[Symbol.iterator]() {
-    for (const i of this.seq()) {
-      yield i;
-    }
-  }
-
   async *[Symbol.asyncIterator]() {
     for await (const i of this.seq()) {
       yield i;
@@ -113,9 +107,9 @@ export class Seq<T> {
 }
 
 export function sequence<T>(list: AsyncIterable<T>): SequenceFnType<T> {
-  return function* gen() {
-    for (const item of list) {
-      yield item;
+  return async function* gen() {
+    for await (const item of list) {
+      yield await item;
     }
   };
 }
