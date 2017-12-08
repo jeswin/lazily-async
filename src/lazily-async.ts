@@ -43,11 +43,11 @@ export class Seq<T> implements AsyncIterable<T> {
     return new Seq(filter(this.seq, fn));
   }
 
-  async find(fn: PredicateType<T>): Promise<T> {
+  async find(fn: PredicateType<T>): Promise<T | undefined> {
     return await find(this.seq, fn);
   }
 
-  async first(predicate?: PredicateType<T>): Promise<T> {
+  async first(predicate?: PredicateType<T>): Promise<T | undefined> {
     return await first(this.seq, predicate);
   }
 
@@ -69,7 +69,7 @@ export class Seq<T> implements AsyncIterable<T> {
     return await includes(this.seq, item);
   }
 
-  async last(predicate?: PredicateType<T>): Promise<T> {
+  async last(predicate?: PredicateType<T>): Promise<T | undefined> {
     return await last(this.seq, predicate);
   }
 
@@ -194,7 +194,7 @@ export function exitAfter<T>(
 export async function find<T>(
   seq: SequenceFnType<T>,
   fn: PredicateType<T>
-): Promise<T> {
+): Promise<T | undefined> {
   let i = 0;
   for await (const item of seq()) {
     if (await fn(item, i, seq)) {
@@ -221,8 +221,8 @@ export function filter<T>(
 
 export async function first<T>(
   _seq: SequenceFnType<T>,
-  predicate: PredicateType<T>
-): Promise<T> {
+  predicate?: PredicateType<T>
+): Promise<T | undefined> {
   const seq = predicate ? filter(_seq, predicate) : _seq;
   for await (const item of seq()) {
     return item;
@@ -263,7 +263,7 @@ export async function includes<T>(
 export async function last<T>(
   _seq: SequenceFnType<T>,
   predicate?: PredicateType<T>
-): Promise<T> {
+): Promise<T | undefined> {
   const seq = predicate ? filter(_seq, predicate) : _seq;
 
   let prev;

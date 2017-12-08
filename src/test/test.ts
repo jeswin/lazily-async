@@ -1,8 +1,8 @@
 import "./preload";
-import "should";
 import { Seq } from "../lazily-async";
+const should = require('should');
 
-async function toArray(seq) {
+async function toArray<T>(seq: Seq<T>) : Promise<Array<T>> {
   const results = [];
   for await (const i of seq) {
     results.push(i);
@@ -24,7 +24,6 @@ describe("lazily-async", async () => {
 
   it(`Seq(list) should return a sequence`, async () => {
     const seq = getSequence();
-    debugger;
     const results = await toArray(seq);
     results.should.deepEqual([1, 2, 3, 4, 5]);
   });
@@ -96,18 +95,26 @@ describe("lazily-async", async () => {
 
   it(`find()`, async () => {
     const result = await getSequence().find(async x => x * 10 === 30);
-
-    result.should.equal(3);
+    should(result).not.be.undefined();
+    if (result) {
+      result.should.equal(3);
+    }
   });
 
   it(`first()`, async () => {
     const result = await getSequence().first();
-    result.should.equal(1);
+    should(result).not.be.undefined();
+    if (result) {
+      result.should.equal(1);
+    }
   });
 
   it(`first(predicate)`, async () => {
     const result = await getSequence().first(async x => x > 3);
-    result.should.equal(4);
+    should(result).not.be.undefined();
+    if (result) {
+      result.should.equal(4);
+    }
   });
 
   it(`flatMap()`, async () => {
@@ -134,12 +141,18 @@ describe("lazily-async", async () => {
 
   it(`last()`, async () => {
     const result = await getSequence().last();
-    result.should.equal(5);
+    should(result).not.be.undefined();
+    if (result) {
+      result.should.equal(5);
+    }
   });
 
   it(`last(predicate)`, async () => {
     const result = await getSequence().last(async x => x < 3);
-    result.should.equal(2);
+    should(result).not.be.undefined();
+    if (result) {
+      result.should.equal(2);
+    }
   });
 
   it(`map()`, async () => {
