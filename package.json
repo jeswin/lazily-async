@@ -1,6 +1,6 @@
 {
   "name": "lazily-async",
-  "version": "0.0.27",
+  "version": "0.0.28",
   "author": "Isotropy Team<isotropy@agilehead.com>",
   "scripts": {
     "build": "tsc",
@@ -14,8 +14,7 @@
     "@types/node": "^8.0.57",
     "@types/should": "^11.2.0",
     "mocha": "*",
-    "should": "*",
-    "source-map-support": "^0.4.8"
+    "should": "*"
   },
   "license": "MIT"
 }
