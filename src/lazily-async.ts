@@ -1,10 +1,10 @@
-type PredicateType<T> = (
+export type PredicateType<T> = (
   val: T,
   i?: number,
   seq?: SequenceFnType<T>
 ) => boolean | Promise<boolean>;
 
-type SequenceFnType<T> = () => AsyncIterableIterator<T>;
+export type SequenceFnType<T> = () => AsyncIterableIterator<T>;
 
 export class Seq<T> implements AsyncIterable<T> {
   seq: SequenceFnType<T>;

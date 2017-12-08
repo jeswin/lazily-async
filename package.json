@@ -1,6 +1,6 @@
 {
   "name": "lazily-async",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "author": "Isotropy Team<isotropy@agilehead.com>",
   "scripts": {
     "build": "tsc",

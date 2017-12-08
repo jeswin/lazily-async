@@ -4,6 +4,7 @@
     "allowJs": false,
     "target": "es2016",
     "module": "commonjs",
+    "declaration": true,
     "lib": ["es2017", "esnext.asynciterable"],
     "allowSyntheticDefaultImports": true,
     "sourceMap": true
