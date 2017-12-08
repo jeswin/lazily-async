@@ -23,8 +23,8 @@ export class Seq<T> implements AsyncIterable<T> {
     }
   }
 
-  concat(seq: Seq<T>): Seq<T> {
-    return new Seq(concat(this.seq, seq.seq));
+  concat(seq: Iterable<T> | AsyncIterable<T>): Seq<T> {
+    return new Seq(concat(this, seq));
   }
 
   async every(fn: PredicateType<T>): Promise<boolean> {
@@ -119,24 +119,24 @@ export class Seq<T> implements AsyncIterable<T> {
 }
 
 export function sequence<T>(
-  list: Iterable<T> | AsyncIterable<T>
+  iterable: Iterable<T> | AsyncIterable<T>
 ): SequenceFnType<T> {
   return async function* gen() {
-    for await (const item of list) {
+    for await (const item of iterable) {
       yield item;
     }
   };
 }
 
 export function concat<T>(
-  seq: SequenceFnType<T>,
-  newSeq: SequenceFnType<T>
+  iterable: Iterable<T> | AsyncIterable<T>,
+  newIterable: Iterable<T> | AsyncIterable<T>
 ): SequenceFnType<T> {
   return async function*() {
-    for await (const i of seq()) {
+    for await (const i of iterable) {
       yield i;
     }
-    for await (const j of newSeq()) {
+    for await (const j of newIterable) {
       yield j;
     }
   };
@@ -293,7 +293,7 @@ export async function reduce<T, TAcc>(
     item: T,
     i?: number,
     seq?: SequenceFnType<T>
-  ) => TAcc |Promise<TAcc>,
+  ) => TAcc | Promise<TAcc>,
   initialValue: TAcc | Promise<TAcc>,
   fnShortCircuit?: (
     acc: TAcc,

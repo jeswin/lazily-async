@@ -51,6 +51,12 @@ describe("lazily-async", async () => {
     results.should.deepEqual([1, 2, 3, 4, 5, 6, 7, 8]);
   });
 
+  it(`concat() Array`, async () => {
+    const seq = getSequence().concat([6, 7, 8]);
+    const results = await toArray(seq);
+    results.should.deepEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+  });
+
   it(`every()`, async () => {
     const result = await getSequence().every(async x => x <= 5);
     result.should.be.ok();
