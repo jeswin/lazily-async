@@ -1,12 +1,13 @@
 {
   "name": "lazily-async",
-  "version": "0.0.26",
+  "version": "0.0.27",
   "author": "Isotropy Team<isotropy@agilehead.com>",
   "scripts": {
     "build": "tsc",
     "test": "mocha dist/test/test.js"
   },
   "main": "dist/lazily-async.js",
+  "types": "dist/lazily-async.d.ts",
   "dependencies": {},
   "devDependencies": {
     "@types/mocha": "^2.2.44",
