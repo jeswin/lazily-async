@@ -1,16 +1,15 @@
-/* @flow */
 type PredicateType<T> = (
   val: T,
   i?: number,
   seq?: SequenceFnType<T>
 ) => boolean | Promise<boolean>;
 
-type SequenceFnType<T> = () => AsyncGenerator<T, void, void>;
+type SequenceFnType<T> = () => AsyncIterableIterator<T>;
 
-export class Seq<T> {
+export class Seq<T> implements AsyncIterable<T> {
   seq: SequenceFnType<T>;
 
-  static of(list: Iterable<T> | AsyncIterable<T>): Seq<T> {
+  static of<T>(list: Iterable<T> | AsyncIterable<T>) {
     return new Seq(sequence(list));
   }
 
@@ -44,16 +43,24 @@ export class Seq<T> {
     return new Seq(filter(this.seq, fn));
   }
 
-  async find(fn: PredicateType<T>): Promise<?T> {
+  async find(fn: PredicateType<T>): Promise<T> {
     return await find(this.seq, fn);
   }
 
-  async first(predicate: PredicateType<T>): Promise<?T> {
+  async first(predicate?: PredicateType<T>): Promise<T> {
     return await first(this.seq, predicate);
   }
 
   flatMap<TOut>(
-    fn: (val: T, i: number, seq: SequenceFnType<T>) => SequenceFnType<TOut>
+    fn: (
+      val: T,
+      i: number,
+      seq: SequenceFnType<T>
+    ) =>
+      | Iterable<TOut>
+      | AsyncIterable<TOut>
+      | Promise<Iterable<TOut>>
+      | Promise<AsyncIterable<TOut>>
   ): Seq<TOut> {
     return new Seq(flatMap(this.seq, fn));
   }
@@ -62,12 +69,12 @@ export class Seq<T> {
     return await includes(this.seq, item);
   }
 
-  async last(predicate: PredicateType<T>): Promise<?T> {
+  async last(predicate?: PredicateType<T>): Promise<T> {
     return await last(this.seq, predicate);
   }
 
   map<TOut>(
-    fn: (val: T, i: number, seq: SequenceFnType<T>) => TOut
+    fn: (val: T, i: number, seq: SequenceFnType<T>) => TOut | Promise<TOut>
   ): Seq<TOut> {
     return new Seq(map(this.seq, fn));
   }
@@ -78,14 +85,14 @@ export class Seq<T> {
       item: T,
       i?: number,
       seq?: SequenceFnType<T>
-    ) => Promise<TAcc>,
-    initialValue: Promise<TAcc>,
+    ) => TAcc | Promise<TAcc>,
+    initialValue: TAcc | Promise<TAcc>,
     fnShortCircuit?: (
       acc: TAcc,
       item?: T,
       i?: number,
       seq?: SequenceFnType<T>
-    ) => boolean
+    ) => boolean | Promise<boolean>
   ): Promise<TAcc> {
     return await reduce(this.seq, fn, initialValue, fnShortCircuit);
   }
@@ -115,9 +122,8 @@ export function sequence<T>(
   list: Iterable<T> | AsyncIterable<T>
 ): SequenceFnType<T> {
   return async function* gen() {
-    // $FlowFixMe
     for await (const item of list) {
-      yield await item;
+      yield item;
     }
   };
 }
@@ -188,7 +194,7 @@ export function exitAfter<T>(
 export async function find<T>(
   seq: SequenceFnType<T>,
   fn: PredicateType<T>
-): Promise<?T> {
+): Promise<T> {
   let i = 0;
   for await (const item of seq()) {
     if (await fn(item, i, seq)) {
@@ -216,7 +222,7 @@ export function filter<T>(
 export async function first<T>(
   _seq: SequenceFnType<T>,
   predicate: PredicateType<T>
-): Promise<?T> {
+): Promise<T> {
   const seq = predicate ? filter(_seq, predicate) : _seq;
   for await (const item of seq()) {
     return item;
@@ -225,7 +231,15 @@ export async function first<T>(
 
 export function flatMap<T, TOut>(
   seq: SequenceFnType<T>,
-  fn: (val: T, i: number, seq: SequenceFnType<T>) => SequenceFnType<TOut>
+  fn: (
+    val: T,
+    i: number,
+    seq: SequenceFnType<T>
+  ) =>
+    | Iterable<TOut>
+    | AsyncIterable<TOut>
+    | Promise<Iterable<TOut>>
+    | Promise<AsyncIterable<TOut>>
 ): SequenceFnType<TOut> {
   return async function*() {
     let i = 0;
@@ -243,13 +257,13 @@ export async function includes<T>(
   seq: SequenceFnType<T>,
   what: T
 ): Promise<boolean> {
-  return await some(seq, item => item === what);
+  return await some(seq, async item => item === what);
 }
 
 export async function last<T>(
   _seq: SequenceFnType<T>,
-  predicate: PredicateType<T>
-): Promise<?T> {
+  predicate?: PredicateType<T>
+): Promise<T> {
   const seq = predicate ? filter(_seq, predicate) : _seq;
 
   let prev;
@@ -261,7 +275,7 @@ export async function last<T>(
 
 export function map<T, TOut>(
   seq: SequenceFnType<T>,
-  fn: (val: T, i: number, seq: SequenceFnType<T>) => TOut
+  fn: (val: T, i: number, seq: SequenceFnType<T>) => TOut | Promise<TOut>
 ): SequenceFnType<TOut> {
   return async function*() {
     let i = 0;
@@ -279,14 +293,14 @@ export async function reduce<T, TAcc>(
     item: T,
     i?: number,
     seq?: SequenceFnType<T>
-  ) => Promise<TAcc>,
-  initialValue: Promise<TAcc>,
+  ) => TAcc |Promise<TAcc>,
+  initialValue: TAcc | Promise<TAcc>,
   fnShortCircuit?: (
     acc: TAcc,
     item?: T,
     i?: number,
     seq?: SequenceFnType<T>
-  ) => boolean
+  ) => boolean | Promise<boolean>
 ): Promise<TAcc> {
   let acc = await initialValue;
   let i = 0;
@@ -355,7 +369,7 @@ export function sort<T>(
 }
 
 export async function toArray<T>(seq: SequenceFnType<T>): Promise<Array<T>> {
-  const results = [];
+  const results: Array<T> = [];
   for await (const item of seq()) {
     results.push(item);
   }
