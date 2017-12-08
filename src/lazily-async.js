@@ -3,14 +3,14 @@ type PredicateType<T> = (
   val: T,
   i?: number,
   seq?: SequenceFnType<T>
-) => boolean;
+) => boolean | Promise<boolean>;
 
 type SequenceFnType<T> = () => AsyncGenerator<T, void, void>;
 
 export class Seq<T> {
   seq: SequenceFnType<T>;
 
-  static of(list) {
+  static of(list: AsyncIterable<T>) : Seq<T> {
     return new Seq(sequence(list));
   }
 
