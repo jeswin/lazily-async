@@ -10,7 +10,7 @@ type SequenceFnType<T> = () => AsyncGenerator<T, void, void>;
 export class Seq<T> {
   seq: SequenceFnType<T>;
 
-  static of(list: AsyncIterable<T>) : Seq<T> {
+  static of(list: Iterable<T> | AsyncIterable<T>): Seq<T> {
     return new Seq(sequence(list));
   }
 
@@ -54,7 +54,7 @@ export class Seq<T> {
 
   flatMap<TOut>(
     fn: (val: T, i: number, seq: SequenceFnType<T>) => SequenceFnType<TOut>
-  ) : Seq<TOut> {
+  ): Seq<TOut> {
     return new Seq(flatMap(this.seq, fn));
   }
 
@@ -73,7 +73,12 @@ export class Seq<T> {
   }
 
   async reduce<TAcc>(
-    fn: (acc: TAcc, item: T, i?: number, seq?: SequenceFnType<T>) => Promise<TAcc>,
+    fn: (
+      acc: TAcc,
+      item: T,
+      i?: number,
+      seq?: SequenceFnType<T>
+    ) => Promise<TAcc>,
     initialValue: Promise<TAcc>,
     fnShortCircuit?: (
       acc: TAcc,
@@ -106,8 +111,11 @@ export class Seq<T> {
   }
 }
 
-export function sequence<T>(list: AsyncIterable<T>): SequenceFnType<T> {
+export function sequence<T>(
+  list: Iterable<T> | AsyncIterable<T>
+): SequenceFnType<T> {
   return async function* gen() {
+    // $FlowFixMe
     for await (const item of list) {
       yield await item;
     }
@@ -266,7 +274,12 @@ export function map<T, TOut>(
 
 export async function reduce<T, TAcc>(
   seq: SequenceFnType<T>,
-  fn: (acc: TAcc, item: T, i?: number, seq?: SequenceFnType<T>) => Promise<TAcc>,
+  fn: (
+    acc: TAcc,
+    item: T,
+    i?: number,
+    seq?: SequenceFnType<T>
+  ) => Promise<TAcc>,
   initialValue: Promise<TAcc>,
   fnShortCircuit?: (
     acc: TAcc,
