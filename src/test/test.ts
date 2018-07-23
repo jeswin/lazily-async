@@ -1,8 +1,11 @@
+import "mocha";
+import "should";
+import { Seq } from "..";
 import "./preload";
-import { Seq } from "../lazily-async";
-const should = require('should');
 
-async function toArray<T>(seq: Seq<T>) : Promise<Array<T>> {
+const should = require("should");
+
+async function toArray<T>(seq: Seq<T>): Promise<Array<T>> {
   const results = [];
   for await (const i of seq) {
     results.push(i);
