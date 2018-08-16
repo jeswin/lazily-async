@@ -1,9 +1,8 @@
 {
   "name": "lazily-async",
-  "version": "0.0.32",
+  "version": "0.0.33",
   "author": "Jeswin<jeswinpk@agilehead.com>",
   "scripts": {
-    "build": "tsc",
     "test": "tsc && mocha dist/test/test.js"
   },
   "main": "dist/index.js",
