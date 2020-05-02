@@ -1,6 +1,6 @@
 {
   "name": "lazily-async",
-  "version": "0.0.33",
+  "version": "1.0.0",
   "author": "Jeswin<jeswinpk@agilehead.com>",
   "scripts": {
     "test": "tsc && mocha dist/test/test.js"
@@ -8,13 +8,13 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@types/node": "^10.5.2"
+    "@types/node": "^13.13.4"
   },
   "devDependencies": {
-    "@types/mocha": "^5.2.5",
+    "@types/mocha": "^7.0.2",
     "@types/should": "^13.0.0",
-    "mocha": "5.2.0",
-    "should": "13.2.1"
+    "mocha": "^7.1.2",
+    "should": "^13.2.3"
   },
   "license": "MIT"
 }
