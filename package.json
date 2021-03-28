@@ -1,7 +1,11 @@
 {
   "name": "lazily-async",
   "version": "1.0.1",
-  "author": "Jeswin<jeswinpk@agilehead.com>",
+  "author": "Jeswin Kumar<jeswinpk@agilehead.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jeswin/lazily-async"
+  },
   "scripts": {
     "test": "tsc && mocha dist/test/test.js"
   },
