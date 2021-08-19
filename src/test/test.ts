@@ -1,9 +1,6 @@
-import "mocha";
-import "should";
+import should from "should";
 import { Seq } from "..";
 import "./preload";
-
-const should = require("should");
 
 async function toArray<T>(seq: Seq<T>): Promise<Array<T>> {
   const results = [];
