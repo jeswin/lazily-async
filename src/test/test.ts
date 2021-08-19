@@ -1,6 +1,6 @@
 import should from "should";
-import { Seq } from "..";
-import "./preload";
+import { Seq } from "../index.js";
+import "./preload.js";
 
 async function toArray<T>(seq: Seq<T>): Promise<Array<T>> {
   const results = [];
